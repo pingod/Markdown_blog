@@ -1,785 +1,203 @@
----
-title: 小书匠语法使用手册
-tags: 小书匠,语法,MARKDOWN,帮助
-grammar_abbr: true
-grammar_table: true
-grammar_defList: true
-grammar_emoji: true
-grammar_footnote: true
-grammar_ins: true
-grammar_mark: true
-grammar_sub: true
-grammar_sup: true
-grammar_checkbox: true
-grammar_mathjax: true
-grammar_flow: true
-grammar_sequence: true
-grammar_plot: true
-grammar_code: true
-grammar_highlight: true
-grammar_html: true
-grammar_linkify: true
-grammar_typographer: true
-grammar_video: true
-grammar_audio: true
-grammar_attachment: true
-grammar_mermaid: true
-grammar_classy: true
-grammar_cjkEmphasis: true
-grammar_cjkRuby: true
-grammar_center: true
-grammar_align: true
-grammar_tableExtra: true
---- 
-
-# 常用语法
-
-___
-
-## 标题
-
-这是 H1 一级标题
-======
-这是 H2 二级标题
-------
-# 这是 H1 一级标题
-## 这是 H2 二级标题
-### 这是 H3 三级标题
-#### 这是 H4 四级标题
-##### 这是 H5 五级标题
-###### 这是 H6 六级标题
-
-**快捷键**: [ctrl + h]
-
-
-## 列表
-### 无序列表
-* 项目1
-  * 子项目1.1
-  * 子项目1.2
-    * 子项目1.2.1
-* 项目2
-* 项目3
-
-+ 项目1
-  + 子项目1.1
-  + 子项目1.2
-    + 子项目1.2.1
-+ 项目2
-+ 项目3
-
-- 项目1
-  - 子项目1.1
-  - 子项目1.2
-    - 子项目1.2.1
-- 项目2
-- 项目3
+> 文章同步于[Github blog](https://github.com/Pines-Cheng/blog)
+> SSH 的相关知识是一个比较冷门的领域，网上的资料很少，而且大部分都讲得很浅，有些还有错误。目前为止我找到的关于SSH最权威的资料就是这个了：[O‘RELLY的《SSH: The Secure Shell - The Definitive Guide》](http://openyoudao.org/_media/ssh_second_edition.pdf)。当然，RFC文档除外
 
-**快捷键**: [ctrl + u]
-### 有序列表
-1. 项目1
-2. 项目2
-3. 项目3
-    1. 项目3.1
-    2. 项目3.2
+## 简介
 
-1. 项目1
-1. 项目2
-1. 项目3
-    1. 项目3.1
-    1. 项目3.2
+`SSH（Secure Shell）`是一个提供数据通信安全、远程登录、远程指令执行等功能的安全网络协议，由芬兰赫尔辛基大学研究员`Tatu Ylönen`，于1995年提出，其目的是用于替代非安全的Telnet、rsh、rexec等远程Shell协议。之后SSH发展了两个大版本SSH-1和SSH-2。
 
-### 有序列表起始编号
-58. 项目5
-2. 项目6
+通过使用SSH，你可以把所有传输的数据进行加密，这样"中间人"这种攻击方式就不可能实现了，而且也能够防止 `DNS欺骗` 和 `IP欺骗`。使用SSH，还有一个额外的好处就是传输的数据是经过压缩的，所以可以加快传输的速度。SSH有很多功能，它既可以代替Telnet，又可以为FTP、Pop、甚至为PPP提供一个安全的"通道"。
+![enter description here][1]
+SSH为一项创建在**应用层**和**传输层**基础上的安全协议，为计算机上的 Shell 提供安全的传输和使用环境。
 
-**快捷键**: [ctrl + o]
+## SSH的基本框架
 
+SSH协议框架中最主要的部分是三个协议：
 
-## 链接
-[链接名称](链接地址)
-[链接名称][1]
-[1] : 链接地址
+*   `传输层协议（The Transport Layer Protocol）`：传输层协议提供服务器认证，数据机密性，信息完整性等的支持。
+*   `用户认证协议（The User Authentication Protocol）`：用户认证协议为服务器提供客户端的身份鉴别。
+*   `连接协议（The Connection Protocol）`：连接协议将加密的信息隧道复用成若干个逻辑通道，提供给更高层的应用协议使用。
 
+同时SSH协议框架中还为许多高层的网络安全应用协议提供扩展的支持。它们之间的层次关系可以用如下图来表示：
 
+![enter description here][2]
 
-## 图片
-![名称](链接地址)
-![名称][1]
-[1] : 链接地址
+## SSH的加密
 
-## 文字格式
-**这是文字粗体格式**
+SSH从安全和性能两方面综合考虑，结合使用了 `Public Key/Private key（公钥/私钥）` 和 `Secret Key（密钥）`。
 
-__这是文字粗体格式__
+*   `Public Key/Private key`：非对称加密，安全，但**效率低**，不适合大规模进行数据的加密和解密操作
+*   `Secret Key`：对称机密，高效，但**安全性相对较低**，Key的分发尤其不方便
 
-*这是文字斜体格式*
+对密码学基础知识和数字签名了解，可以参考阮一峰的博文
 
-_这是文字斜体格式_
+*   [密码学笔记](http://www.ruanyifeng.com/blog/2006/12/notes_on_cryptography.html)
+*   [数字签名是什么](http://www.ruanyifeng.com/blog/2011/08/what_is_a_digital_signature.html)
 
+## SSH的主要特性
 
-## 引用
-> 第一行引用文字
-> 第二行引用文字
+*   加密：避免数据内容泄漏
+*   通信的完整性：避免数据被篡改，以及发送或接受地址伪装
+    （检查数据是否被篡改，数据是否来自发送者而非攻击者） `SSH-2` 通过 `MD5` 和 `SHA-1` 实现该功能，`SSH-1` 使用 `CRC-32`
+*   认证：识别数据发送者和接收者身份 客户端验证SSH服务端的身份：防止攻击者仿冒SSH服务端身份，避免中介人攻击和重定向请求的攻击；`OpenSSH` 通过在 `know-hosts` 中存储主机名和 `host key` 对服务端身份进行认证 服务端验证请求者身份：提供安全性较弱的用户密码方式，和安全性更强的 `per-user` `public-key signatures`；此外SSH还支持与第三方安全服务系统的集成，如 `Kerberos`等
+*   授权：用户访问控制
+*   Forwarding or tunneling to encrypt other TCP/IP-based sessions 可以通过SSH为Telnet、FTP等提供通信安全保障，支持三种类型的 `Forwarding` 操作：`Port Forwarding`；`X Forwarding`；`Agent Forwarding`
 
+## SSH中的Key
 
+SSH结合使用了`Public Key/Private key`和`Secret Key`：
 
-## 水平线
-***
+*   `Public Key/Private key（非对称加密）`用于在建立安全通道前在客户端和服务端之间传输 `Secret Key`和进行`身份认证`；
+*   `Secret Key（对称加密）`则用来作为SSH会话的安全保证，对数据进行加密和解密。
 
+SSH可以处理4种密钥：
 
-___
+| 名称 | 生命周期 | 创建 | 类型 | 描述 |
+| --- | --- | --- | --- | --- |
+| Host Key | 持久化 | 服务端 | Public Key | Host Key是服务器用来证明自己身份的一个永久性的非对称密钥 |
+| User Key | 持久化 | 用户 | Public Key | User Key 是客户端用来证明用户身份的一个永久性的非对称密钥（一个用户可以有多个密钥/身份标识） |
+| Server Key | 默认为1小时 | 服务端 | Public Key | Server Key 是SSH-1协议中使用的一个临时的非对称密钥，每隔一定的间隔（默认是一个小时）都会在服务器重新生成。用于对Session Key进行加密（仅SSH-1协议有，SSH-2对其进行了增强，这里Server Key作为一个概念便于在流程中进行描述） |
+| Session Key | 客户端 | 会话（Session） | Secret Key | Session Key是一个随机生成的对称密钥，用户SSH客户端和服务器之间的通信进行加密，会话结束时，被销毁 |
 
-# GFM扩展语法
+SSH框架：
 
-___
+![enter description here][3]
+## 安全连接的建立
 
-## 表格
-First Header  | Second Header
-------------- | -------------
-Content Cell  | Content Cell
-Content Cell  | Content Cell
+在进行有意义的会话之前，SSH客户端和服务器必须首先建立一条安全连接。该连接可以允许双方共享密钥、密码，最后可以相互传输任何数据。
 
+现在我们介绍SSH-1协议是如何确保网络连接的安全性的。SSH-1客户端和服务器从阿卡似乎经过很多个步骤，协商使用加密算法，生成并共享一个会话密钥，最终建立一条安全连接：
 
-## 增强型表格
-|First Header  | Second Header ||
-|First Header  | Second Header | Third Header|
-|------------- | -------------|-------------|
-表身1Content Cell  | Merge Content Cell||
-Content Cell  | Content Cell| Content Cell|
+1.  客户端连接到服务器上
+2.  客户端和服务器交换自己支持的SSH协议版本号
+3.  客户端和服务器切换到基于报文的协议
+4.  服务器向客户端提供自己的身份证明和会话参数
+5.  客户端给服务器发送一个（会话）密钥
+6.  双方启用加密并完成服务器认证
+7.  建立安全连接
 
-表身2Content Cell  | Merge Content Cell||
-Content Cell  | Content Cell| Content Cell|
-[表格标题]
+![enter description here][4]
 
 
-## 代码
-### 行内代码
-`var x = "hello world"`
-### 块代码
-```javascript
-var a = "hello world";
-var b = "good luck";
-```
+每个阶段均涉及到客户端与服务端的多次交互，通过这些交互过程完成包括证书传输、算法协商、通道加密等过程。
 
+### 1 客户端连接到服务器上
 
+这个步骤没什么好说的，就是向服务器的TCP端口（约定是22）发送连接请求。
 
-## 自动转换成超链接
-系统将自动根据内容，将地址转换成超链接格式
-http://markdown.xiaoshujiang.com
+### 2 客户端和服务器交换自己支持的协议版本号
 
-
-## HTML
-<div class="hey">Hello world</div>
-[支持的html标签](https://github.com/github/markup/tree/master#html-sanitization)
-
-
-## 删除线
-```markdown
-~~在文字上添加删除线~~
-```
-
-___
-
-# 扩展语法
-
-___
-
-## 目录
-[toc]
-
-
-
-## 扩展的文字格式
-++插入的文字++
-
-==被记号的文字==
-
-上角文字: 19^th^
-
-下角文字: H~2~O
-
-
-
-## 印刷字替换
-系统将自动替换下列文字，转换成排版系统使用的符号
-```markdown
-(c) (C) (r) (R) (tm) (TM) (p) (P) +-
-```
-
-
-## 缩写定义
-The HTML specification
-is maintained by the W3C.
-*[HTML]: Hyper Text Markup Language
-*[W3C]:  World Wide Web Consortium
-
-
-## 待办事项
--[ ] 未完成事项
--[ ] 未完成事项
--[x] 完成事项
--[X] 完成事项
-
-
-## 脚注
-脚注[^1x]
-[^1x]: 脚注的用法
-
-
-## 定义
-苹果
-: 一种水果
-: 一种品牌，计算机，手持设备
-桔子
-: 一种水果
-
-
-
-## 公式
-
-### 行内公式
-这是行内公式`!$ \Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,. $`
-
-### 块公式
-markdown
-```mathjax!
-$$\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.$$
-```
-
-
-
-### 流程图 ([语法](http://adrai.github.io/flowchart.js/))
-markdown
-```flow
-st=>start: 开始
-e=>end: 结束
-op=>operation: 操作步骤
-cond=>condition: 是 或者 否?
-
-st->op->cond
-cond(yes)->e
-cond(no)->op
-```
-
-
-
-### 序列图 ([语法](https://github.com/bramp/js-sequence-diagrams/blob/master/src/grammar.jison))
-markdown
-```sequence
-小明->小李: 你好 小李, 最近怎么样?
-Note right of 小李: 小李想了想
-小李-->小明: 还是老样子
-```
-
-
-___
-
-# 小书匠编辑器扩展语法
-
-___
-
-## 块代码内文字格式
-### 块代码高亮标记
-markdown
-```javascript
-var >>==hello==<< = 'hello world'
-```
-
-### 块代码删除线
-markdown
-```javascript
-var >>~~hello~~<< = 'hello world'
-```
-
-### 块代码加粗
-markdown
-```javascript
-var >>**hello**<< = 'hello world'
-```
-
-### 块代码下横线
-markdown
-```javascript
-var >>++hello++<< = 'hello world'
-```
-
-
-
-小书匠编辑器提供了附件管理功能，用户可通过`./`对附件的引用，比如图片`./jiangzhu.jpg`。附件的上传需通过工具栏的插入图片`ctrl+g`，插入视频`ctrl+shift+v`，插入音频`ctrl+shift+a`，插入附件`ctrl+shift+t`功能键进行操作。
-## 视频
-```markdown
-%[名称](链接地址)
-%[名称][1]
-[1] : 链接地址
+这些协议是以 ASCII 字符串表示，例如：`SSH-1.5-1.2.27`，其意义为SSH协议，版本号是V1.5，SSH1实现版本为1.2.27。可以使用 Telnet 客户端连接到一个SSH服务器端口是看到这个字符串：
 
 ```
-
-## 音频
-```markdown
-~[名称](链接地址)
-~[名称][1]
-[1] : 链接地址
+➜ telnet 192.168.1.200 22
+Trying 192.168.1.200...
+Connected to doc.dinghuo123.com.
+Escape character is '^]'.
+SSH-2.0-OpenSSH_6.0p1 Debian-4+deb7u6
 ```
 
-## 附件
-```markdown
-=[名称](链接地址)
-=[名称][1]
-[1] : 链接地址
+如果客户端和服务器确定其协议版本号是兼容的，那么连按就继续进行，否则，双方都可能决定中断连接。例如，如果一个只使用 SSH-1 的客户端连接到一个只使用 SSH-2 的服务器上，那么客户端就会断开连接并打印一条错误消息。实际上还可能执行其他操作：例如，只使用SSH-2的服务器可以调用SSH-1服务器来处理这次连接请求。
+
+### 3 客户端和服务器切换基于报文的协议
+
+协议版本号交换过程一旦完成，客户端和服务器都立即从下层的 TCP 连接切换到基于子报文的协议。每个报文都包含一个32位的字段，1 - 8字节的填充位[ 用来防止已知明文攻击unknown-plaintext attack ]，一个1字节的报文类型代码, 报文有效数据和一个4字节的完整性检査字段。
+
+### 4 服务器向客户提洪自己的身份证明和会话参数
+
+服务器向客户端发送以下信息(现在还沒有加密):
+
+*   `主机密钥（Host Key）`，用于后面证明服务器主机的身份
+*   `服务器密钥（Server Key）`，用来帮助建立安全连接
+*   8个随机字节序列，称为`检测字节（check bytes)`。客户端在下一次响应中必须包括这些检测字节，否則服务器就会拒绝接收响应信息，这种方法可以防止某些 `IP伪装攻击(IP spoofing attack)`。
+*   该服务器支持的加密、压缩和认证方法
+
+此时，双方都要计算一个通用的 128 位`会话标识符(Session ID)`。它在某些协议中用来惟一标识这个 SSH 会话。该值是 `主机密钥（Host Key）`、`服务器密钥（Server Key）`和`检测字节（check bytes)`一起应用 `MD5散列函数` 得到的结果。
+
+当客户端接收到 `主机密钥（Host Key）`时，它要进行询问：“之前我和这个服务器通信过吗？如果通信过，那么它的主机密钥是什么呢？”要回答这个问题，客户端就要査阅自己的已知名主机数据库。如果新近到达的主机密钥可以和数据库中以前的一个密钥匹，那么就没有问题了。
+
+但是，此时还存在两种可能：已知名主机数据库中没有这个服务器，也可能有这个服务器但是其主机密钥不同。在这两种情况中，客户端要选择是信任这个新近到达的密钥还是拒绝接受该密钥。此时就需要人的指导参与了，例如，客户端用户可能被提示要求确定是接受还是拒绝该密钥。
+
+```
+The authenticity of host 'ssh-server.example.com (12.18.429.21)' can't be established.
+RSA key fingerprint is 98:2e:d7:e0:de:9f:ac:67:28:c2:42:2d:37:16:58:4d.
+Are you sure you want to continue connecting (yes/no)?
 ```
 
-## 元数据
-元数据必须放置在每篇文章的开头才能生效。如果文章里有元数据时，系统将自动以元数据的标题为准，用户通过文章信息的维护界面修改的标题及tags将会被覆盖掉。
-```markdown
----
-title: 小书匠语法使用手册
-tags: 小书匠,语法,MARKDOWN,帮助
---- 
-```
+如果客户端拒绝接受这个主机密钥，那么连接就中止了。让我们假设客户端接受该密钥，现在继续介绍。
 
+### 5 客户端给眼务器发送一个(会话)密钥
 
-## mermaid流程图，序列图，甘特图（[mermaid语法](http://knsv.github.io/mermaid/index.html)）
+现在客户端为双方都支持的 `bulk箅法` 随机生成一个新密钥，称为 `会话密钥（Session Key）`。其目的是对客户端和服务器之间发送的数据进行加密和解密。所需要做的工作是把这个 `会话密钥（Session Key）发送给服务器`，双方就可以启用加密并开始安全通信了。
 
-markdown
-```mermaid!
-graph TD;
-A-->B;
-A-->C;
-B-->D;
-C-->D;
-```
+当然，客户端不能简单地把`会话密钥（Session Key）`发送给服务器。此时数据还没有进行加密，如果第三方中途截获了这个密钥，那么他就可以解密客户端和服务器之间的消息。此后你就和安全性无缘了。因此客户端必须安全地发送`会话密钥（Session Key）`。 这是通过两次加密实现的：一次使用服务器的公共`主机密钥（Host Key）`，一次使用`服务器密钥（Server Key）`。
 
+这个步骤确保只有服务器可以读取`会话密钥（Session Key）`。在`会话密钥（Session Key）`经过两次加密之后，客户端就将其发送给服务器，同时还会发送检测字节和所选定的算法(这些算法是从第4步中服务器支持的算法列表中挑选出来的）。
 
+### 6 双方启用加密并完成服务器认证
 
-## 统计图 （[统计图语法](https://github.com/flot/flot/blob/master/API.md)）
-数据格式为：`{"data": [], "options":{}}`
-系统使用[jquery.parseJSON()](http://api.jquery.com/jquery.parsejson/)函数进行解析，因此代码必须符合该函数的要求才能正常解析。
-markdown
-```plot!
-{
-"data": [ [[0, 0], [1, 1]] ],
-"options": { "yaxis": { "max": 1 } }
-}
-```
+在发送会话密钥之后，双方开始使用密钥和所选定的 `bulk算法` 对会话数据进行加密，但是在开始继续发送其他数据之前，客户端要等待服务器发来一个确认消息，该消息（以及之后的所有数据）都必须使用这个`会话密钥（Session Key）`加密。这是最后一歩，它提供了服务器认证：只有目的服务器才可以解密 `会话密钥（Session Key）`，因为它是使用前面的 `主机密钥（Host Key）`（这个密钥已经对已知名主机列表进行了验证）进行加密的。
 
+如果没有`会话密钥（Session Key）`，假冒的服务器就不能解密以后的协议通信，也就不能生成有效的通信，客户端会注意到这一点并中断连接。
 
+注意服务器认址是隐含的；并没有显式交换来验证服务器`主机密钥（Host Key）`。因此客户端在继续发送数椐之前，必须等待服务器使用新`会话密钥（Session Key）`作出有意义的响应。 从而在处理之前验证服务的身份，虽然 SSH-1 协议在这点上并没有什么特殊 . 但是 SSH-2 需要服务器认证时显示地地交换`会话密钥（Session Key）`。
 
-## 自定义class
+使用`服务器密钥（Server Key）`对`会话密钥（Session Key）`再进行一次加密就提供了一种称为完美转发安全性的特性。这就是说不存在永久性密钥泄露的可能，因为它不会危害到其他部分和以后SSH会话的安全性。如果我们只使用服务器`主机密钥（Host Key）`来保护`会话密钥（Session Key）`， 那么`主机密钥（Host Key）`的泄露就会危害到以后的通倍，并允许解密原来记录下来的会话。使用`服务器密钥（Server Key）`再加密次就消除了这种缺点，因为`服务器密钥（Server Key）`是临时的，它不会保存到磁盘上，而且会周期性地更新（缺省情况下，一小时更新一次)。如果一个入侵者已经获取了服务器的私钥，那么他必须还要执行中间人攻击或服务器欺骗攻击才能对会话造成损害。
 
-## 自定义class {class名称}
+### 7 建立安全连接
 
-通过自定义的class名称后，你就可以在每篇文章的自定义css里添加自己想要的样式了．
+由于客户端和服务器现在都知道`会话密钥（Session Key）`，而其他人都不知道，因此他们就可以相互发送加密消息(使用他们一致同意的 `bulk算法` )并对其进行解密了。而且，客户端还可以完成服务器认证。我们现在就已经准备好开始客户端认证了。
 
+## 客户端认证
 
-## cjk强调
-``` markdown
-_这里将显示带有衬线字体效果的中文做为强调_
-```
+SSH提供多种客户端认证方式。
 
+SSH-1：
 
-## cjk注音标示
-``` markdown
-{需要被注音标示的内容}(注音标示)
-{需要被注音标示的内容}[编号]
-[编号]: 注音标示
-```
+*   Password
+*   Public Key
+*   Kerberos
+*   Rhosts && RhostsRSA
+*   TIS
 
+SSH-2：
 
-## 居中显示文字
-```markdown
-->居中显示的文字<-
-```
+*   Password
+*   Public Key
+*   hostbased 在SSH-2中考虑 Rhosts 存在安全漏洞，废弃了这种方式。
 
+这里之讨论我们经常使用的的 `Password` 和 `Public Key` 方式。
 
-## 对齐显示文字
+此时安全通道已经及建立，之后的所有内容都通过 `Session Key` 加密后进行传输。
 
-```markdown
-:>居左显示的文字<-
-->居右显示的文字<:
-:>两端对齐显示的文字<:
-->居中显示的文字<-
-```
-注： 该语法与center语法冲突，两种语法同时开启时，align语法将覆盖center语法。
+### Password
 
-----------
+`Password` 方式既客户端提供用户和密码，服务端对用户和密码进行匹配，完成认证。类Unix系统中，如 OpenSSH 的框架，一般通过系统的本地接口完成认证。
 
+`Password` 的优势是简单，无需任何而外的配置就可以使用。缺点密码不便于记忆，过于简单的密码容易被暴力破解。
 
-___
+### Public Key
 
-# 示例
+`Public Key` 认证的基本原理是基于**非对称加密方式**，分别在服务端对一段数据通过公钥进行加密，如果客户端能够证明其可以使用私钥对这段数据进行解密，则可以说明客户端的身份。因为服务端需要使用客户端生成的密钥对的公钥对数据首先加密，所以需要先将公钥存储到服务端的密钥库（Auhtorized Key）。还记得Github中使用git协议push代码前需要先添加SSH KEY吗？
 
+下面详细介绍一个通过 `Public Key` 进行客户端认证的过程。
 
-___
+1.  客户端发起一个 `Public Key` 的认证请求，并发送 `RSA Key` 的模数作为标识符。（如果想深入了解RSA Key详细 --> 维基百科）
+2.  服务端检查是否存在请求帐号的公钥（Linux中存储在 `~/.ssh/authorized_keys` 文件中），以及其拥有的访问权限。如果没有则断开连接
+3.  服务端使用对应的公钥对一个随机的256位的字符串进行加密，并发送给客户端
+4.  客户端使用私钥对字符串进行解密，并将其结合 `Session ID` 生成一个MD5值发送给服务端。 结合 `Session ID` 的目的是为了避免攻击者采用 `重放攻击（replay attack）`。
+5.  服务端采用同样的方式生成 MD5值 与客户端返回的 MD5值 进行比较，完成对客户端的认证。
 
-[toc]
+## 图解SSH
+![enter description here][5]
+## 参考
 
-![箭竹](./jianzhu.jpg)
+*   [SSH原理简介](http://erik-2-blog.logdown.com/posts/74081-ssh-principle)
+*   [SSH协议介绍](http://blog.csdn.net/macrossdzh/article/details/5691924)
+*   [O‘RELLY的《SSH: The Secure Shell - The Definitive Guide》](http://openyoudao.org/_media/ssh_second_edition.pdf)
 
-http://www.github.com/suziwen/markdownxiaoshujiang
-http://www.xiaoshujiang.com
 
-# 这是 H1 一s级标题
-## 这是 H2 二级标题
-### 这是 H3 三级标题
-#### 这是 H4 四级标题
-##### 这是 H5 五级标题
-###### 这是 H6 六级标题
-
-### 视频
-%[电影](http://markdown.xiaoshujiang.com/media/movie.ogg)
-
-### 音频
-~[音乐](http://markdown.xiaoshujiang.com/media/horse.ogg)
-
-### 附件
-=[附件](./jianzhu.jpg)
-
-### 待办事项
--[ ] 未完成事项
--[x] 完成事项
--[X] 完成事项
-
-### 缩写定义
-
-The HTML specification
-is maintained by the W3C.
-
-*[HTML]: Hyper Text Markup Language
-*[W3C]:  World Wide Web Consortium
-
-### 印刷字替换
-
-(c) (C) (r) (R) (tm) (TM) (p) (P) +-
-
-### html代码
-
-<div>html代码</div>
-
-### 流程图 ([语法](http://adrai.github.io/flowchart.js/))
-
-```flow
-st=>start: 开始
-e=>end: 结束
-op=>operation: 操作步骤
-cond=>condition: 是 或者 否?
-
-st->op->cond
-cond(yes)->e
-cond(no)->op
-```
-
-### 序列图 ([语法](https://github.com/bramp/js-sequence-diagrams/blob/master/src/grammar.jison))
-
-```sequence
-小明->小李: 你好 小李, 最近怎么样?
-Note right of 小李: 小李想了想
-小李-->小明: 还是老样子
-```
-
-### 脚注[^1x]
-
-[^1x]: 脚注的用法
-
-### 表格Tables
-
-First Header  | Second Header
-------------- | -------------
-Content Cell  | Content Cell
-Content Cell  | Content Cell
-
-### 定义
-
-苹果
-: 一种水果
-: 一种品牌，计算机，手持设备
-
-桔子
-: 一种水果
-
-### 文字格式
-
-**这是文字粗体格式**
-
-__这是文字粗体格式__
-
-*这是文字斜体格式*
-
-_这是文字斜体格式_
-
-~~在文字上添加删除线~~
-
-++插入的文字++
-
-==被记号的文字==
-
-上角文字: 19^th^
-
-下角文字: H~2~O
-
-### 无序列表
-
-* 项目1
-  * 子项目1.1
-  * 子项目1.2
-    * 子项目1.2.1
-* 项目2
-* 项目3
-
-### 有序列表
-
-1. 项目1
-2. 项目2
-3. 项目3
-    1. 项目3.1
-    2. 项目3.2
-
-### 有序列表起始编号
-
-58. 项目5
-2. 项目6
-
-### 图片
-
-![图片名称](http://xiaoshujiang.com/favicon.ico)
-链接
-
-[链接名称](http://xiaoshujiang.com)
-### 引用
-
-> 第一行引用文字
-> 第二行引用文字
-### 水平线
-
-***
-### 代码
-
-#### 行内代码
-
-`var x = "hello world"`
-
-#### 块代码
-
-```java
-/**
- * @author John Smith <john.smith@example.com>
- * @version 1.0
-*/
-package l2f.gameserver.model;
-
-import >>++java.util.ArrayList++<<;
-
->>~~public abstract class L2Character {~~<<
->>++public abstract class L2Character extends L2Object {++<<
-  public static final Short ABNORMAL_EFFECT_BLEEDING = 0x0_0_0_1; // not sure
-
-  public void moveTo(int x, int y, int z) {
-    _ai = null;
-    _log.warning("Should not be called");
-    if (1 > 5) {
-      return;
-    }
-  }
-
-  /** Task of AI notification */
-  @SuppressWarnings( { "nls", "unqualified-field-access", "boxing" })
-  >>==public class NotifyAITask implements Runnable {
-    private final CtrlEvent _evt;
-
-    List<String> mList==<< = new ArrayList<String>()
-
-    public void run() {
-      try {
-        getAI().notifyEvent(_evt, _evt.class, null);
-      } catch (Throwable t) {
-        t.printStackTrace();
-      }
-    }
-  }
-}
-```
-## 块代码内文字格式
-### 块代码高亮标记
-```javascript
-  var >>==hello==<< = 'hello world'
-```
-### 块代码删除线
-```javascript
-  var >>~~hello~~<< = 'hello world'
-```
-### 块代码加粗
-```javascript
-  var >>**hello**<< = 'hello world'
-```
-### 块代码下横线
-```javascript
-  var >>++hello++<< = 'hello world'
-```
-
-### 显示行号
-``` javascript?linenums
-var x = 1;
-var z = 'str';
-```
-
-### 高亮指定行
-``` javascript?linenums&fancy=1,3,5
-var x = 1;
-var y = 2;
-var z = 3;
-var u = 4;
-var w = 5;
-var a = 6;
-```
-
-### 显示行号并从指定行数计数
-``` javascript?linenums=10
-var x = 1;
-```
-
-### 禁用显示行号
-``` javascript?linenums=false
-var x = 1;
-```
-
-### 公式
-#### 行内公式
-这是行内公式`!$ \Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,. $`
-#### 块公式
-```mathjax!
-$$\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.$$
-```
-
-#### 带编号的公式
-`!$\eqref{ref1}$`
-
-```mathjax!
-\begin{equation}
-\int_0^\infty \frac{x^22}{e^x-1}\,dx = \frac{\pi^4}{15}\label{ref1}
-\end{equation}
-```
-
-`!$\eqref{ref1}$`
-### 统计图
-```plot!
-{
-"data": [ [[0, 0], [1, 1]] ],
-"options": { "yaxis": { "max": 1 } }
-}
-```
-
-### mermaid流程图，序列图，甘特图
-
-
-#### 流程图
-```mermaid!
-graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
-```
-
-#### 序列图
-
-```mermaid!
-sequenceDiagram
-A->> B: Query
-B->> C: Forward query
-Note right of C: Thinking...
-C->> B: Response
-B->> A: Forward response
-```
-
-#### 甘特图
-```mermaid!
-gantt
-        dateFormat  YYYY-MM-DD
-        title Adding GANTT diagram functionality to mermaid
-        section A section
-        Completed task            :done,    des1, 2014-01-06,2014-01-08
-        Active task               :active,  des2, 2014-01-09, 3d
-        Future task               :         des3, after des2, 5d
-        Future task2               :         des4, after des3, 5d
-        section Critical tasks
-        Completed task in the critical line :crit, done, 2014-01-06,24h
-        Implement parser and jison          :crit, done, after des1, 2d
-        Create tests for parser             :crit, active, 3d
-        Future task in critical line        :crit, 5d
-        Create tests for renderer           :2d
-        Add to mermaid                      :1d
-```
-
-### PPT语法
-
-使用
-```
- 
- ----
- 
-```
-作为一个水平页分割线，注意在`----`前后都需要空一行
-
-使用
-```
- 
- --
- 
-```
-作为一个垂直页分割线, 注意在`--`前后都需要空一行
-
-通过如下形式
-```
-<!-- .element: class="fragment" data-fragment-index="1" -->
-```
-可以实现fragment显示效果
-
-注：　在演示文档模式下，`toc`和脚注语法将失效.
-
-
-### emoji表情[语法](https://github.com/twitter/twemoji)
-
-> Classic markup: :wink: :crush: :cry: :tear: :laughing: :yum:
->
-> Shortcuts (emoticons): :-) :-( 8-) ;)
-
-### 自定义class
-
-#### 自定义class用例{green}
-
-你可以通过查看生成的html代码里，在h4里找到名为`green`的class名称．
-
-### cjk强调
-
-#### _这里将显示中文衬线字体做为强调样式_
-
-### cjk注音标示
-
-{小}(xiao){书}(shu){匠}(jiang)
-
-### 居中显示
-
-->居中显示的{文字}(wenzi)<-
-
-->![箭竹](./jianzhu.jpg)<-
-
-### 文字对齐
-
-:>居左显示的文字<-
-
-->居右显示的文字<:
-
-:>两端对齐显示的文字<:
-
-->居中显示的文字<-
-
-### 增强型表格
-|First Header  | Second Header ||
-|First Header  | Second Header | Third Header|
-|------------- | -------------|-------------|
-表身1Content Cell  | Merge Content Cell||
-Content Cell  | Content Cell| Content Cell|
-
-表身2Content Cell  | Merge Content Cell||
-Content Cell  | Content Cell| Content Cell|
-[表格标题]
+  [1]: ./images/1508310487770.jpg
+  [2]: ./images/1508310523051.jpg
+  [3]: ./images/1508310572776.jpg
+  [4]: ./images/1508310674358.jpg
+  [5]: ./images/20140113163143937.jpg "20140113163143937"
